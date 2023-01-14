@@ -4,7 +4,7 @@ import {
    deleteCardById,
    dislikeCard,
    getCards,
-   likeCard
+   likeCard,
   } from '../controllers/cards';
 
 const cardsRouter = Router();
