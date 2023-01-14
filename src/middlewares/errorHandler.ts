@@ -1,16 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 
 const errorHandler = ((err: any, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode = 500, message } = err;  // если у ошибки нет статуса, выставляем 500
+  const { statusCode = 500, message } = err;
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500  // проверяем статус и выставляем сообщение в зависимости от него
+      message: statusCode === 500
         ? 'На сервере произошла ошибка'
-        : message
-    })
-    console.log(err.name, statusCode);
-
+        : message,
+    });
+  next();
 });
 
 export default errorHandler;

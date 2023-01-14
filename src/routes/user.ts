@@ -4,13 +4,13 @@ import {
   getUserById,
   getUsers,
   updateUserInfo,
-  updateUserAvatar
+  updateUserAvatar,
 } from '../controllers/user';
 
 const userRouter = Router();
 
 userRouter.get('/', getUsers);
-userRouter.get('/:id', getUserById)
+userRouter.get('/:id', getUserById);
 userRouter.post('/', createUser);
 userRouter.patch('/me', updateUserInfo);
 userRouter.patch('/me/avatar', updateUserAvatar);

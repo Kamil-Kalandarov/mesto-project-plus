@@ -1,7 +1,7 @@
 {
   "name": "starterkits",
   "version": "1.0.0",
-  "description": "< Добавьте описание проекта в свободной форме >",
+  "description": "мой первый сервер на Node.js",
   "main": "dist/app.js",
   "scripts": {
     "lint": "npx eslint src/**/*.ts",
@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "inspect": "ts-node-dev --debug --inspect -- src/index.ts"
   },
-  "author": "< Укажите здесь автора работы >",
+  "author": "Kamil-Kalandarov",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.13",
