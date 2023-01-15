@@ -46,7 +46,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 export const updateUserInfo = (req: RequestCustom, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
   const selectedUser = req.user?._id;
-  User.findByIdAndUpdate(selectedUser, { name, about }, { new: true })
+  User.findByIdAndUpdate(selectedUser, { name, about }, { new: true, runValidators: true })
     .orFail(new NotFoundError('Пользователь с указанным _id не найден'))
     .then((user) => {
       res.status(200).send({ data: user });
@@ -63,7 +63,7 @@ export const updateUserInfo = (req: RequestCustom, res: Response, next: NextFunc
 export const updateUserAvatar = (req: RequestCustom, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
   const selectedUser = req.user?._id;
-  User.findByIdAndUpdate(selectedUser, { avatar }, { new: true })
+  User.findByIdAndUpdate(selectedUser, { avatar }, { new: true, runValidators: true })
     .orFail(new NotFoundError('Пользователь с указанным _id не найден'))
     .then((user) => {
       res.status(200).send({ data: user });
