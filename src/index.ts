@@ -35,7 +35,6 @@ app.use(errorHandler);
 async function connect() {
   try {
     mongoose.set('strictQuery', true)
-    mongoose.set('runValidators', true)
     await mongoose.connect('mongodb://localhost:27017/mestodb')
     console.log('База данных подключена')
     await app.listen(PORT)
