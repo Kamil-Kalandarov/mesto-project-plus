@@ -1,10 +1,15 @@
-import express, { Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
+import { errors } from 'celebrate';
 import errorHandler from './middlewares/errorHandler';
 import mongoose from 'mongoose';
 import mainRouter from './routes/index';
-import { RequestCustom } from './types/types';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import NotFoundError from './errors/not-found-err';
+import auth from './middlewares/auth';
+import { createUser, login } from './controllers/user';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import { createUserValidation, loginValidation } from './middlewares/validators/userValidator';
 
 const { PORT = 3000 } = process.env;
 
@@ -21,21 +26,26 @@ app.use(express.urlencoded({ extended: true }));
 app.use(limiter);
 app.use(helmet());
 
-app.use((req: RequestCustom, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '63befa866f84444c1d9cc58a'
-  };
-  next();
+app.use(requestLogger);
+
+app.post('/signin', loginValidation, login);
+app.post('/signup', createUserValidation, createUser);
+
+app.use('/', auth, mainRouter);
+
+app.use((req: Request, res: Response) => {
+  throw new NotFoundError('Страница не найдена')
 });
 
-app.use('/', mainRouter);
+app.use(errorLogger);
+
+app.use(errors());
 
 app.use(errorHandler);
 
 async function connect() {
   try {
     mongoose.set('strictQuery', true)
-    mongoose.set('runValidators', true)
     await mongoose.connect('mongodb://localhost:27017/mestodb')
     console.log('База данных подключена')
     await app.listen(PORT)

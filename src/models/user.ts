@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcrypt';
+import UnauthorizedError from '../errors/unauthorized_error';
 
 interface IUser {
   name: string,
@@ -7,6 +9,12 @@ interface IUser {
   avatar: string,
   email: string,
   password: string,
+}
+
+interface IUserModel extends mongoose.Model<IUser> {
+  findUserByCredentials:
+    // eslint-disable-next-line no-unused-vars
+    (email: string, password: string) => Promise<mongoose.Document<unknown, any, IUser>>
 }
 
 const UserSchema = new mongoose.Schema<IUser>({
@@ -25,30 +33,39 @@ const UserSchema = new mongoose.Schema<IUser>({
   avatar: {
     type: String,
     validate: {
-      validator: (v: string) => validator.isURL(v),
+      validator: (v: any) => validator.isURL(v),
       message: 'Некорректный URL',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
     unique: true,
+    required: true,
     validate: {
-      validator: (v: string) => validator.isEmail(v),
-      message: 'Некорректный email'
+      validator: (v: any) => validator.isEmail(v),
+      message: 'Некорректный email',
     },
   },
   password: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
-    validate: {
-      validator: (v: string) => validator.isStrongPassword(v),
-      message: 'Некорректный email'
-    },
-  }
+    required: true,
+    select: false,
+  },
 });
 
-export default mongoose.model('User', UserSchema);
+UserSchema.static('findUserByCredentials', function findUserByCredentials(email: string, password: string) {
+  return this.findOne({ email }).select('+password')
+    .orFail(new UnauthorizedError('Неправильные почта или пароль'))
+    .then((user: any) => {
+      bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            throw new UnauthorizedError('Неправильные почта или пароль');
+          }
+          return user;
+        });
+    });
+});
+
+export default mongoose.model<IUser, IUserModel>('User', UserSchema);

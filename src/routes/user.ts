@@ -1,8 +1,13 @@
 import { Router } from 'express';
 import {
-  createUser,
+  getUserByIdValidation,
+  updateUserInfoValidation,
+  updateUserAvatarValidation,
+} from '../middlewares/validators/userValidator';
+import {
   getUserById,
   getUsers,
+  getUser,
   updateUserInfo,
   updateUserAvatar,
 } from '../controllers/user';
@@ -10,9 +15,9 @@ import {
 const userRouter = Router();
 
 userRouter.get('/', getUsers);
-userRouter.get('/:id', getUserById);
-userRouter.post('/', createUser);
-userRouter.patch('/me', updateUserInfo);
-userRouter.patch('/me/avatar', updateUserAvatar);
+userRouter.get('/me', getUser);
+userRouter.get('/:id', getUserByIdValidation, getUserById);
+userRouter.patch('/me', updateUserInfoValidation, updateUserInfo);
+userRouter.patch('/me/avatar', updateUserAvatarValidation, updateUserAvatar);
 
 export default userRouter;
