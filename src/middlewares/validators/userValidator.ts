@@ -34,7 +34,7 @@ export const createUserValidation = celebrate({
 
 export const getUserByIdValidation = celebrate({
   params: Joi.object().keys({
-    id: Joi.string()
+    id: Joi.string().length(24).hex()
   }).unknown(true)
 });
 
@@ -70,10 +70,6 @@ export const loginValidation = celebrate({
     .messages({
       'string.email': 'Невалидный email',
     }),
-    password: Joi.string().min(5).max(30).required()
-    .messages({
-      'string.min': 'Минимальная длина пароля - 5 символов',
-      'string.max': 'Максимальная длина пароля - 30 символов',
-    })
+    password: Joi.string().required()
   }).unknown(true)
 })

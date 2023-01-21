@@ -32,6 +32,7 @@
       {
         "allow": ["_id"]
       }
-    ]
+    ],
+    "arrow-body-style": 0
   }
 }

@@ -19,6 +19,6 @@ export const createCardValidation = celebrate({
 
 export const cardIdValidation = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string()
+    cardId: Joi.string().length(24).hex()
   }).unknown(true)
 });

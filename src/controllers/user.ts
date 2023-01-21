@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -7,6 +8,10 @@ import NotFoundError from '../errors/not-found-err';
 import BadRequestError from '../errors/bad-request-err';
 import { RequestCustom } from '../types/types';
 import ConflictError from '../errors/conflict-error';
+
+dotenv.config();
+
+const { JWT_SECRET_KEY = '762365B2F23E681D0512833274B14322A39DFF275708B526885715A0B3325D39' } = process.env;
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
@@ -56,8 +61,11 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       email,
       password: hash,
     }))
-    .then((user) => {
-      res.status(201).send({ data: user });
+    .then((user: any) => {
+      let userCopy = user;
+      userCopy = user.toObject();
+      delete userCopy.password;
+      res.status(201).send({ data: userCopy });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -109,7 +117,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET_KEY as string, { expiresIn: '7d' });
       res.status(200).send({ token });
     })
     .catch(next);

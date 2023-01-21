@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
 import { errors } from 'celebrate';
 import errorHandler from './middlewares/errorHandler';
 import mongoose from 'mongoose';
@@ -11,7 +12,9 @@ import { createUser, login } from './controllers/user';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import { createUserValidation, loginValidation } from './middlewares/validators/userValidator';
 
-const { PORT = 3000 } = process.env;
+dotenv.config();
+
+const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
@@ -23,10 +26,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(limiter);
 app.use(helmet());
 
 app.use(requestLogger);
+
+app.use(limiter);
 
 app.post('/signin', loginValidation, login);
 app.post('/signup', createUserValidation, createUser);
@@ -46,7 +50,7 @@ app.use(errorHandler);
 async function connect() {
   try {
     mongoose.set('strictQuery', true)
-    await mongoose.connect('mongodb://localhost:27017/mestodb')
+    await mongoose.connect(MONGO_URL)
     console.log('База данных подключена')
     await app.listen(PORT)
     console.log(`Сервер запущен на порту: ${PORT}`)
